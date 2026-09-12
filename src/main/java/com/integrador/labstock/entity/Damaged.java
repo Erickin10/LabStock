@@ -27,6 +27,11 @@ public class Damaged extends BaseEntity {
     @JoinColumn(name = "student_id", nullable = false)
     private User student;
 
+    // Usuario LAB que registrou o dano
+    @ManyToOne
+    @JoinColumn(name = "lab_id", nullable = false)
+    private User lab;
+
     // Motivo do dano
     @Column(nullable = false)
     private String reason;
