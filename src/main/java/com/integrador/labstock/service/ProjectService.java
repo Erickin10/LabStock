@@ -131,7 +131,7 @@ public class ProjectService {
         Item item = itemRepository.findById(request.getItemId())
                 .orElseThrow(() -> new ResourceNotFoundException("Item não encontrado"));
 
-        if (item.getDeletedAt() != null) {
+        if (item.getDeletedAt() != null || item.getIsInactive() == true) {
             throw new ResourceNotFoundException("Item não encontrado");
         }
 
