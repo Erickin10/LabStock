@@ -28,7 +28,7 @@ public interface LendingRepository extends JpaRepository<Lending, Long> {
     @Query("SELECT COALESCE(SUM(l.quantity), 0) FROM Lending l " +
            "WHERE l.item.id = :itemId AND l.status = 'APPROVED' " +
            "AND l.returned = false AND l.deletedAt IS NULL")
-    Integer sumActiveQuantityByItemId(@Param("itemId") Long itemId);
+    Integer sumLentQuantityByItemId(@Param("itemId") Long itemId);
 
     // Verifica se existe emprestimo ativo para um item
     boolean existsByItemIdAndStatusAndReturnedFalseAndDeletedAtIsNull(Long itemId, LendingStatus status);

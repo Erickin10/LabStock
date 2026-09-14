@@ -87,7 +87,7 @@ public class UserService {
         return responses;
     }
 
-    public UserResponse findById(Long id) {
+    public UserResponse findById (Long id) {
 
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado"));
@@ -99,7 +99,7 @@ public class UserService {
         return toUserResponse(user);
     }
 
-    public UserResponse updateRole(Long id, UpdateRoleRequest request) {
+    public UserResponse updateRole (Long id, UpdateRoleRequest request) {
 
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado"));
@@ -120,7 +120,7 @@ public class UserService {
         return toUserResponse(user);
     }
 
-    public UserResponse updateProfile(Long id, UpdateProfileRequest request) {
+    public UserResponse updateProfile (Long id, UpdateProfileRequest request) {
 
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado"));
@@ -150,7 +150,7 @@ public class UserService {
         return toUserResponse(user);
     }
 
-    public void delete(Long id) {
+    public void delete (Long id) {
 
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado"));
