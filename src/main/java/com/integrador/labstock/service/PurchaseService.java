@@ -1,5 +1,6 @@
 package com.integrador.labstock.service;
 
+import org.springframework.transaction.annotation.Transactional;
 import com.integrador.labstock.dto.response.PurchaseResponse;
 import com.integrador.labstock.entity.Purchase;
 import com.integrador.labstock.exception.BusinessException;
@@ -12,6 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
+@Transactional(readOnly = true)
 public class PurchaseService {
 
     @Autowired
@@ -39,6 +41,7 @@ public class PurchaseService {
         return responses;
     }
 
+    @Transactional
     public PurchaseResponse markAsBought (Long id) {
 
         Purchase purchase = purchaseRepository.findById(id)

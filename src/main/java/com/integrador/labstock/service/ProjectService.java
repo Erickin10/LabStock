@@ -1,5 +1,6 @@
 package com.integrador.labstock.service;
 
+import org.springframework.transaction.annotation.Transactional;
 import com.integrador.labstock.dto.request.ProjectItemRequest;
 import com.integrador.labstock.dto.request.ProjectRequest;
 import com.integrador.labstock.dto.response.ProjectItemResponse;
@@ -21,6 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
+@Transactional(readOnly = true)
 public class ProjectService {
 
     @Autowired
@@ -35,6 +37,7 @@ public class ProjectService {
     @Autowired
     private LendingRepository lendingRepository;
 
+    @Transactional
     public ProjectResponse create (ProjectRequest request) {
 
         Project project = new Project();
@@ -74,6 +77,7 @@ public class ProjectService {
         return toProjectResponse(project);
     }
 
+    @Transactional
     public ProjectResponse update (Long id, ProjectRequest request) {
 
         Project project = projectRepository.findById(id)
@@ -90,6 +94,7 @@ public class ProjectService {
         return toProjectResponse(project);
     }
 
+    @Transactional
     public ProjectResponse inactivate (Long id) {
 
         Project project = projectRepository.findById(id)
@@ -106,6 +111,7 @@ public class ProjectService {
         return toProjectResponse(project);
     }
 
+    @Transactional
     public void delete (Long id) {
 
         Project project = projectRepository.findById(id)
@@ -119,6 +125,7 @@ public class ProjectService {
         projectRepository.save(project);
     }
 
+    @Transactional
     public ProjectResponse addItem (Long projectId, ProjectItemRequest request) {
 
         Project project = projectRepository.findById(projectId)
@@ -149,6 +156,7 @@ public class ProjectService {
         return toProjectResponse(project);
     }
 
+    @Transactional
     public ProjectResponse removeItem (Long projectId, Long itemId) {
 
         Project project = projectRepository.findById(projectId)

@@ -1,5 +1,6 @@
 package com.integrador.labstock.service;
 
+import org.springframework.transaction.annotation.Transactional;
 import com.integrador.labstock.dto.request.ItemRequest;
 import com.integrador.labstock.dto.response.ItemResponse;
 import com.integrador.labstock.entity.Item;
@@ -16,6 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
+@Transactional(readOnly = true)
 public class ItemService {
 
     @Autowired
@@ -24,6 +26,7 @@ public class ItemService {
     @Autowired
     private LendingRepository lendingRepository;
 
+    @Transactional
     public ItemResponse create (ItemRequest request) {
 
         Category category;
@@ -73,6 +76,7 @@ public class ItemService {
         return toItemResponse(item);
     }
 
+    @Transactional
     public ItemResponse update (Long id, ItemRequest request) {
 
         Item item = itemRepository.findById(id)
@@ -99,6 +103,7 @@ public class ItemService {
         return toItemResponse(item);
     }
 
+    @Transactional
     public ItemResponse inactivate (Long id) {
 
         Item item = itemRepository.findById(id)
@@ -115,6 +120,7 @@ public class ItemService {
         return toItemResponse(item);
     }
 
+    @Transactional
     public void delete (Long id) {
 
         Item item = itemRepository.findById(id)
