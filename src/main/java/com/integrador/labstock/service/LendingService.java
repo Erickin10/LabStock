@@ -1,5 +1,8 @@
 package com.integrador.labstock.service;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.transaction.annotation.Transactional;
 import com.integrador.labstock.dto.request.LendingRequest;
 import com.integrador.labstock.dto.response.LendingResponse;
 import com.integrador.labstock.entity.Item;
@@ -19,6 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
+@Transactional(readOnly = true)
 public class LendingService {
 
     @Autowired
@@ -29,7 +33,10 @@ public class LendingService {
 
     @Autowired
     private UserRepository userRepository;
+    private static final Logger logger = LoggerFactory.getLogger(LendingService.class);
 
+
+    @Transactional
     public LendingResponse create (LendingRequest request) {
 
         Item item = itemRepository.findById(request.getItemId())
@@ -43,6 +50,7 @@ public class LendingService {
         Integer availableQuantity = item.getQuantity() - lentQuantity;
 
         if (request.getQuantity() > availableQuantity) {
+            logger.warn("Estoque insuficiente para criacaodo emprestimo. Quantidade solicitada: ", lentQuantity," Quantidade disponivel: ",availableQuantity);
             throw new BusinessException("Estoque insuficiente. Disponível: " + availableQuantity);
         }
 
@@ -111,6 +119,7 @@ public class LendingService {
         return responses;
     }
 
+    @Transactional
     public LendingResponse approve (Long id) {
 
         Lending lending = lendingRepository.findById(id)
@@ -132,6 +141,7 @@ public class LendingService {
         return toLendingResponse(lending);
     }
 
+    @Transactional
     public LendingResponse reject (Long id) {
 
         Lending lending = lendingRepository.findById(id)
@@ -152,6 +162,7 @@ public class LendingService {
         return toLendingResponse(lending);
     }
 
+    @Transactional
     public LendingResponse returnItem (Long id) {
 
         Lending lending = lendingRepository.findById(id)

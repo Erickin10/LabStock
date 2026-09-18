@@ -1,5 +1,6 @@
 package com.integrador.labstock.service;
 
+import org.springframework.transaction.annotation.Transactional;
 import com.integrador.labstock.dto.request.LoginRequest;
 import com.integrador.labstock.dto.request.RegisterRequest;
 import com.integrador.labstock.dto.request.UpdateProfileRequest;
@@ -19,11 +20,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
+@Transactional(readOnly = true)
 public class UserService {
 
     @Autowired
     private UserRepository userRepository;
 
+    @Transactional
     public LoginResponse register (RegisterRequest request) {
 
         // Verifica se o email ja existe no banco
@@ -99,6 +102,7 @@ public class UserService {
         return toUserResponse(user);
     }
 
+    @Transactional
     public UserResponse updateRole (Long id, UpdateRoleRequest request) {
 
         User user = userRepository.findById(id)
@@ -120,6 +124,7 @@ public class UserService {
         return toUserResponse(user);
     }
 
+    @Transactional
     public UserResponse updateProfile (Long id, UpdateProfileRequest request) {
 
         User user = userRepository.findById(id)
@@ -150,6 +155,7 @@ public class UserService {
         return toUserResponse(user);
     }
 
+    @Transactional
     public void delete (Long id) {
 
         User user = userRepository.findById(id)

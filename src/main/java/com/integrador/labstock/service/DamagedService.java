@@ -1,5 +1,6 @@
 package com.integrador.labstock.service;
 
+import org.springframework.transaction.annotation.Transactional;
 import com.integrador.labstock.dto.request.DamagedRequest;
 import com.integrador.labstock.dto.response.DamagedResponse;
 import com.integrador.labstock.entity.Damaged;
@@ -17,6 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
+@Transactional(readOnly = true)
 public class DamagedService {
 
     @Autowired
@@ -28,6 +30,7 @@ public class DamagedService {
     @Autowired
     private UserRepository userRepository;
 
+    @Transactional
     public DamagedResponse create (DamagedRequest request) {
 
         Item item = itemRepository.findById(request.getItemId())
