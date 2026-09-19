@@ -56,12 +56,18 @@ public class ItemService {
         return toItemResponse(item);
     }
 
-    public List<ItemResponse> listAll (String search) {
+    public List<ItemResponse> listAll (String name, String category) {
+
+        System.out.println("NOME RECEBIDO: [" + name + "] | CATEGORIA RECEBIDA: [" + category + "]");
 
         List<Item> items;
 
-        if (search != null && !search.isEmpty()) {
-            items = itemRepository.findBySearch(search);
+        if (name != null && !name.isEmpty() && category != null && !category.isEmpty()) {
+            items = itemRepository.findBySearchAndCategory(name, category);
+        } else if (name != null && !name.isEmpty()) {
+            items = itemRepository.findBySearch(name);
+        } else if (category != null && !category.isEmpty()) {
+            items = itemRepository.findByCategory(category);
         } else {
             items = itemRepository.findByDeletedAtIsNull();
         }

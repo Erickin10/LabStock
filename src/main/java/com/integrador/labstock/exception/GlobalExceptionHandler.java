@@ -3,7 +3,6 @@ package com.integrador.labstock.exception;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.dao.DataIntegrityViolationException;
 import com.integrador.labstock.dto.response.ApiResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -31,7 +30,6 @@ public class GlobalExceptionHandler {
     // Captura BusinessException e retorna 400 (Bad Request)
     @ExceptionHandler(BusinessException.class)
     public ResponseEntity<ApiResponse<Void>> handleBusinessException(BusinessException ex) {
-        logger.warn("Regra de negocio violada: {}", ex.getMessage());
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
                 .body(ApiResponse.error(ex.getMessage()));
@@ -54,16 +52,5 @@ public class GlobalExceptionHandler {
         return ResponseEntity
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(ApiResponse.error("Erro interno do servidor"));
-    }
-
-    //Captura qualquer excecao que nao tenha sido pega por um handler mais especifico antes dele,
-    // sendo um tipo de rede de seguranca, caso aconteca algo que nao esteja previsto,
-    //resumindo para o usario nao receber um erro feio, masi conhecido como "catch all"
-    @ExceptionHandler(DataIntegrityViolationException.class)
-    public ResponseEntity<ApiResponse<Void>> handleDataIntegrityViolation(DataIntegrityViolationException ex) {
-        logger.error("Erro interno nao tratado", ex);
-        return ResponseEntity
-                .status(HttpStatus.CONFLICT)
-                .body(ApiResponse.error("Operação viola uma regra de integridade dos dados"));
     }
 }
