@@ -1,5 +1,7 @@
 package com.integrador.labstock.service;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
 import com.integrador.labstock.dto.request.ProjectItemRequest;
 import com.integrador.labstock.dto.request.ProjectRequest;
@@ -37,13 +39,19 @@ public class ProjectService {
     @Autowired
     private LendingRepository lendingRepository;
 
+    private static final Logger logger = LoggerFactory.getLogger(ProjectService.class);
+
     @Transactional
     public ProjectResponse create (ProjectRequest request) {
+
+        logger.info("Criando projeto com nome={}", request.getName());
 
         Project project = new Project();
         project.setName(request.getName());
 
         projectRepository.save(project);
+
+        logger.info("Projeto criado com sucesso, id={}", project.getId());
 
         return toProjectResponse(project);
     }
@@ -80,6 +88,8 @@ public class ProjectService {
     @Transactional
     public ProjectResponse update (Long id, ProjectRequest request) {
 
+        logger.info("Atualizando projeto id={}", id);
+
         Project project = projectRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Projeto não encontrado"));
 
@@ -91,11 +101,15 @@ public class ProjectService {
 
         projectRepository.save(project);
 
+        logger.info("Projeto id={} atualizado com sucesso", id);
+
         return toProjectResponse(project);
     }
 
     @Transactional
     public ProjectResponse inactivate (Long id) {
+
+        logger.info("Alternando status ativo/inativo do projeto id={}", id);
 
         Project project = projectRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Projeto não encontrado"));
@@ -108,11 +122,15 @@ public class ProjectService {
 
         projectRepository.save(project);
 
+        logger.info("Projeto id={} agora está com isInactive={}", id, project.getIsInactive());
+
         return toProjectResponse(project);
     }
 
     @Transactional
     public void delete (Long id) {
+
+        logger.info("Excluindo projeto id={}", id);
 
         Project project = projectRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Projeto não encontrado"));
@@ -123,10 +141,14 @@ public class ProjectService {
 
         project.setDeletedAt(LocalDateTime.now());
         projectRepository.save(project);
+        logger.info("Projeto id={} excluído com sucesso", id);
+
     }
 
     @Transactional
     public ProjectResponse addItem (Long projectId, ProjectItemRequest request) {
+
+        logger.info("Vinculando item id={} ao projeto id={}", request.getItemId(), projectId);
 
         Project project = projectRepository.findById(projectId)
                 .orElseThrow(() -> new ResourceNotFoundException("Projeto não encontrado"));
@@ -143,6 +165,7 @@ public class ProjectService {
         }
 
         if (projectItemRepository.existsByProjectIdAndItemId(projectId, request.getItemId())) {
+            logger.warn("Vínculo recusado: item id={} ja esta no projeto id={}", request.getItemId(), projectId);
             throw new BusinessException("Item já está vinculado a este projeto");
         }
 
@@ -153,11 +176,15 @@ public class ProjectService {
 
         projectItemRepository.save(projectItem);
 
+        logger.info("Item id={} vinculado ao projeto id={} com sucesso", request.getItemId(), projectId);
+
         return toProjectResponse(project);
     }
 
     @Transactional
     public ProjectResponse removeItem (Long projectId, Long itemId) {
+
+        logger.info("Removendo item id={} do projeto id={}", itemId, projectId);
 
         Project project = projectRepository.findById(projectId)
                 .orElseThrow(() -> new ResourceNotFoundException("Projeto não encontrado"));
@@ -170,6 +197,8 @@ public class ProjectService {
                 .orElseThrow(() -> new ResourceNotFoundException("Item não está vinculado a este projeto"));
 
         projectItemRepository.delete(projectItem);
+
+        logger.info("Item id={} removido do projeto id={} com sucesso", itemId, projectId);
 
         return toProjectResponse(project);
     }

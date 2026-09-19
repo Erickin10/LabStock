@@ -33,11 +33,14 @@ public class LendingService {
 
     @Autowired
     private UserRepository userRepository;
+
     private static final Logger logger = LoggerFactory.getLogger(LendingService.class);
 
 
     @Transactional
     public LendingResponse create (LendingRequest request) {
+
+        logger.info("Iniciando criacaoo de emprestimo para o item id={}", request.getItemId());
 
         Item item = itemRepository.findById(request.getItemId())
                 .orElseThrow(() -> new ResourceNotFoundException("Item não encontrado"));
@@ -50,7 +53,7 @@ public class LendingService {
         Integer availableQuantity = item.getQuantity() - lentQuantity;
 
         if (request.getQuantity() > availableQuantity) {
-            logger.warn("Estoque insuficiente para criacaodo emprestimo. Quantidade solicitada: ", lentQuantity," Quantidade disponivel: ",availableQuantity);
+            logger.warn("Estoque insuficiente para criacao de emprestimo. Quantidade solicitada={}, Quantidade disponível={}", request.getQuantity(), availableQuantity);
             throw new BusinessException("Estoque insuficiente. Disponível: " + availableQuantity);
         }
 
@@ -75,6 +78,8 @@ public class LendingService {
         lending.setQuantity(request.getQuantity());
 
         lendingRepository.save(lending);
+
+        logger.info("Empréstimo criado com sucesso, id={}", lending.getId());
 
         return toLendingResponse(lending);
     }
@@ -122,6 +127,8 @@ public class LendingService {
     @Transactional
     public LendingResponse approve (Long id) {
 
+        logger.info("Aprovando emprestimo id={}", id);
+
         Lending lending = lendingRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Empréstimo não encontrado"));
 
@@ -130,6 +137,7 @@ public class LendingService {
         }
 
         if (lending.getStatus() != LendingStatus.PENDING) {
+            logger.warn("Aprovacao recusada: emprestimo id={} nao esta pendente", id);
             throw new BusinessException("Apenas empréstimos pendentes podem ser aprovados");
         }
 
@@ -138,11 +146,15 @@ public class LendingService {
 
         lendingRepository.save(lending);
 
+        logger.info("Emprestimo id={} aprovado com sucesso", id);
+
         return toLendingResponse(lending);
     }
 
     @Transactional
     public LendingResponse reject (Long id) {
+
+        logger.info("Rejeitando emprestimo id={}", id);
 
         Lending lending = lendingRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Empréstimo não encontrado"));
@@ -152,10 +164,13 @@ public class LendingService {
         }
 
         if (lending.getStatus() != LendingStatus.PENDING) {
+            logger.warn("Rejeicao recusada: emprestimo id={} não está pendente", id);
             throw new BusinessException("Apenas empréstimos pendentes podem ser rejeitados");
         }
 
         lending.setStatus(LendingStatus.REJECTED);
+
+        logger.info("Emprestimo id={} rejeitado com sucesso", id);
 
         lendingRepository.save(lending);
 
@@ -165,6 +180,8 @@ public class LendingService {
     @Transactional
     public LendingResponse returnItem (Long id) {
 
+        logger.info("Registrando devolucao do emprestimo id={}", id);
+
         Lending lending = lendingRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Empréstimo não encontrado"));
 
@@ -173,10 +190,12 @@ public class LendingService {
         }
 
         if (lending.getStatus() != LendingStatus.APPROVED) {
+            logger.warn("Devolucao recusada: emprestimo id={} nao esta aprovado", id);
             throw new BusinessException("Apenas empréstimos aprovados podem ser devolvidos");
         }
 
         if (lending.getReturned()) {
+            logger.warn("Devolucao recusada: emprestimo id={} ja foi devolvido", id);
             throw new BusinessException("Empréstimo já foi devolvido");
         }
 
@@ -184,6 +203,8 @@ public class LendingService {
         lending.setReturnDate(LocalDateTime.now());
 
         lendingRepository.save(lending);
+
+        logger.info("Empréstimo id={} devolvido com sucesso", id);
 
         return toLendingResponse(lending);
     }
