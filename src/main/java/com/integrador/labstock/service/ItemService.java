@@ -1,5 +1,8 @@
 package com.integrador.labstock.service;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.transaction.annotation.Transactional;
 import com.integrador.labstock.dto.request.ItemRequest;
 import com.integrador.labstock.dto.response.ItemResponse;
 import com.integrador.labstock.entity.Item;
@@ -16,6 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
+@Transactional(readOnly = true)
 public class ItemService {
 
     @Autowired
@@ -24,12 +28,18 @@ public class ItemService {
     @Autowired
     private LendingRepository lendingRepository;
 
+    private static final Logger logger = LoggerFactory.getLogger(ItemService.class);
+
+    @Transactional
     public ItemResponse create (ItemRequest request) {
+
+        logger.info("Criando item com nome={}", request.getName());
 
         Category category;
         try {
             category = Category.valueOf(request.getCategory().toUpperCase());
         } catch (IllegalArgumentException e) {
+            logger.warn("Criacao de item recusada: categoria invalida={}", request.getCategory());
             throw new BusinessException("Categoria inválida");
         }
 
@@ -37,19 +47,25 @@ public class ItemService {
         item.setName(request.getName());
         item.setCategory(category);
         item.setQuantity(request.getQuantity());
-        item.setMin_quantity(request.getMinQuantity());
+        item.setMinQuantity(request.getMinQuantity());
 
         itemRepository.save(item);
 
         return toItemResponse(item);
     }
 
-    public List<ItemResponse> listAll (String search) {
+    public List<ItemResponse> listAll (String name, String category) {
+
+        logger.debug("Buscando itens: nome={}, categoria={}", name, category);
 
         List<Item> items;
 
-        if (search != null && !search.isEmpty()) {
-            items = itemRepository.findBySearch(search);
+        if (name != null && !name.isEmpty() && category != null && !category.isEmpty()) {
+            items = itemRepository.findBySearchAndCategory(name, category);
+        } else if (name != null && !name.isEmpty()) {
+            items = itemRepository.findBySearch(name);
+        } else if (category != null && !category.isEmpty()) {
+            items = itemRepository.findByCategory(category);
         } else {
             items = itemRepository.findByDeletedAtIsNull();
         }
@@ -73,7 +89,10 @@ public class ItemService {
         return toItemResponse(item);
     }
 
+    @Transactional
     public ItemResponse update (Long id, ItemRequest request) {
+
+        logger.info("Atualizando item id={}", id);
 
         Item item = itemRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Item não encontrado"));
@@ -86,20 +105,24 @@ public class ItemService {
         try {
             category = Category.valueOf(request.getCategory().toUpperCase());
         } catch (IllegalArgumentException e) {
+            logger.warn("Atualização recusada: categoria inválida={}", request.getCategory());
             throw new BusinessException("Categoria inválida");
         }
 
         item.setName(request.getName());
         item.setCategory(category);
         item.setQuantity(request.getQuantity());
-        item.setMin_quantity(request.getMinQuantity());
+        item.setMinQuantity(request.getMinQuantity());
 
         itemRepository.save(item);
 
         return toItemResponse(item);
     }
 
+    @Transactional
     public ItemResponse inactivate (Long id) {
+
+        logger.info("Alternando status ativo para inativo do item id={}", id);
 
         Item item = itemRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Item não encontrado"));
@@ -115,7 +138,10 @@ public class ItemService {
         return toItemResponse(item);
     }
 
+    @Transactional
     public void delete (Long id) {
+
+        logger.info("Excluindo item id={}", id);
 
         Item item = itemRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Item não encontrado"));
@@ -138,7 +164,7 @@ public class ItemService {
         response.setCategory(item.getCategory().name());
         response.setQuantity(item.getQuantity());
         response.setAvailableQuantity(availableQuantity);
-        response.setMinQuantity(item.getMin_quantity());
+        response.setMinQuantity(item.getMinQuantity());
         response.setIsInactive(item.getIsInactive());
         return response;
     }

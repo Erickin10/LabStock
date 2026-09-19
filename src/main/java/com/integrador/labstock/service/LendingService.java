@@ -1,5 +1,8 @@
 package com.integrador.labstock.service;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.transaction.annotation.Transactional;
 import com.integrador.labstock.dto.request.LendingRequest;
 import com.integrador.labstock.dto.response.LendingResponse;
 import com.integrador.labstock.entity.Item;
@@ -19,6 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
+@Transactional(readOnly = true)
 public class LendingService {
 
     @Autowired
@@ -30,12 +34,18 @@ public class LendingService {
     @Autowired
     private UserRepository userRepository;
 
+    private static final Logger logger = LoggerFactory.getLogger(LendingService.class);
+
+
+    @Transactional
     public LendingResponse create (LendingRequest request) {
+
+        logger.info("Criando emprestimo para o item id={}", request.getItemId());
 
         Item item = itemRepository.findById(request.getItemId())
                 .orElseThrow(() -> new ResourceNotFoundException("Item não encontrado"));
 
-        if (item.getDeletedAt() != null || item.getIsInactive() == true) {
+        if (item.getDeletedAt() != null || item.getIsInactive()) {
             throw new ResourceNotFoundException("Item não encontrado");
         }
 
@@ -43,6 +53,7 @@ public class LendingService {
         Integer availableQuantity = item.getQuantity() - lentQuantity;
 
         if (request.getQuantity() > availableQuantity) {
+            logger.warn("Estoque insuficiente para criacao de emprestimo. Quantidade solicitada={}, Quantidade disponível={}", request.getQuantity(), availableQuantity);
             throw new BusinessException("Estoque insuficiente. Disponível: " + availableQuantity);
         }
 
@@ -111,7 +122,10 @@ public class LendingService {
         return responses;
     }
 
+    @Transactional
     public LendingResponse approve (Long id) {
+
+        logger.info("Aprovando emprestimo id={}", id);
 
         Lending lending = lendingRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Empréstimo não encontrado"));
@@ -121,6 +135,7 @@ public class LendingService {
         }
 
         if (lending.getStatus() != LendingStatus.PENDING) {
+            logger.warn("Aprovacao recusada: emprestimo id={} nao esta pendente", id);
             throw new BusinessException("Apenas empréstimos pendentes podem ser aprovados");
         }
 
@@ -132,7 +147,10 @@ public class LendingService {
         return toLendingResponse(lending);
     }
 
+    @Transactional
     public LendingResponse reject (Long id) {
+
+        logger.info("Rejeitando emprestimo id={}", id);
 
         Lending lending = lendingRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Empréstimo não encontrado"));
@@ -142,6 +160,7 @@ public class LendingService {
         }
 
         if (lending.getStatus() != LendingStatus.PENDING) {
+            logger.warn("Rejeicao recusada: emprestimo id={} não está pendente", id);
             throw new BusinessException("Apenas empréstimos pendentes podem ser rejeitados");
         }
 
@@ -152,7 +171,10 @@ public class LendingService {
         return toLendingResponse(lending);
     }
 
+    @Transactional
     public LendingResponse returnItem (Long id) {
+
+        logger.info("Registrando devolucao do emprestimo id={}", id);
 
         Lending lending = lendingRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Empréstimo não encontrado"));
@@ -162,10 +184,12 @@ public class LendingService {
         }
 
         if (lending.getStatus() != LendingStatus.APPROVED) {
+            logger.warn("Devolucao recusada: emprestimo id={} nao esta aprovado", id);
             throw new BusinessException("Apenas empréstimos aprovados podem ser devolvidos");
         }
 
         if (lending.getReturned()) {
+            logger.warn("Devolucao recusada: emprestimo id={} ja foi devolvido", id);
             throw new BusinessException("Empréstimo já foi devolvido");
         }
 

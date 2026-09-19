@@ -8,14 +8,7 @@ import com.integrador.labstock.service.UserService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -45,7 +38,7 @@ public class UserController {
     }
 
     @PutMapping("/{id}/profile")
-    public ResponseEntity<ApiResponse<UserResponse>> updateProfile (@PathVariable Long id, @RequestBody UpdateProfileRequest request) {
+    public ResponseEntity<ApiResponse<UserResponse>> updateProfile (@PathVariable Long id, @Valid @RequestBody UpdateProfileRequest request) {
         UserResponse response = userService.updateProfile(id, request);
         return ResponseEntity.ok(ApiResponse.success("Perfil atualizado com sucesso", response));
     }

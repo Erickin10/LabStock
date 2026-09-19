@@ -1,5 +1,8 @@
 package com.integrador.labstock.service;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.transaction.annotation.Transactional;
 import com.integrador.labstock.dto.request.DamagedRequest;
 import com.integrador.labstock.dto.response.DamagedResponse;
 import com.integrador.labstock.entity.Damaged;
@@ -17,6 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
+@Transactional(readOnly = true)
 public class DamagedService {
 
     @Autowired
@@ -28,16 +32,22 @@ public class DamagedService {
     @Autowired
     private UserRepository userRepository;
 
+    private static final Logger logger = LoggerFactory.getLogger(DamagedService.class);
+
+    @Transactional
     public DamagedResponse create (DamagedRequest request) {
+
+        logger.info("Registrando dano para o item id={}", request.getItemId());
 
         Item item = itemRepository.findById(request.getItemId())
                 .orElseThrow(() -> new ResourceNotFoundException("Item não encontrado"));
 
-        if (item.getDeletedAt() != null || item.getIsInactive() == true) {
+        if (item.getDeletedAt() != null || item.getIsInactive()) {
             throw new ResourceNotFoundException("Item não encontrado");
         }
 
         if (request.getQuantity() > item.getQuantity()) {
+            logger.warn("Registro de dano recusado: quantidade maior que o estoque do item id={}", item.getId());
             throw new BusinessException("Quantidade danificada maior que o estoque total");
         }
 
@@ -57,6 +67,8 @@ public class DamagedService {
 
         item.setQuantity(item.getQuantity() - request.getQuantity());
         itemRepository.save(item);
+
+        logger.debug("Estoque do item id={} atualizado apos dano, nova quantidade={}", item.getId(), item.getQuantity());
 
         Damaged damaged = new Damaged();
         damaged.setItem(item);

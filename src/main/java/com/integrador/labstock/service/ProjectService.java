@@ -1,5 +1,8 @@
 package com.integrador.labstock.service;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.transaction.annotation.Transactional;
 import com.integrador.labstock.dto.request.ProjectItemRequest;
 import com.integrador.labstock.dto.request.ProjectRequest;
 import com.integrador.labstock.dto.response.ProjectItemResponse;
@@ -21,6 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
+@Transactional(readOnly = true)
 public class ProjectService {
 
     @Autowired
@@ -35,7 +39,12 @@ public class ProjectService {
     @Autowired
     private LendingRepository lendingRepository;
 
+    private static final Logger logger = LoggerFactory.getLogger(ProjectService.class);
+
+    @Transactional
     public ProjectResponse create (ProjectRequest request) {
+
+        logger.info("Criando projeto com nome={}", request.getName());
 
         Project project = new Project();
         project.setName(request.getName());
@@ -74,7 +83,10 @@ public class ProjectService {
         return toProjectResponse(project);
     }
 
+    @Transactional
     public ProjectResponse update (Long id, ProjectRequest request) {
+
+        logger.info("Atualizando projeto id={}", id);
 
         Project project = projectRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Projeto não encontrado"));
@@ -90,7 +102,10 @@ public class ProjectService {
         return toProjectResponse(project);
     }
 
+    @Transactional
     public ProjectResponse inactivate (Long id) {
+
+        logger.info("Alternando status ativo/inativo do projeto id={}", id);
 
         Project project = projectRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Projeto não encontrado"));
@@ -106,7 +121,10 @@ public class ProjectService {
         return toProjectResponse(project);
     }
 
+    @Transactional
     public void delete (Long id) {
+
+        logger.info("Excluindo projeto id={}", id);
 
         Project project = projectRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Projeto não encontrado"));
@@ -119,7 +137,10 @@ public class ProjectService {
         projectRepository.save(project);
     }
 
+    @Transactional
     public ProjectResponse addItem (Long projectId, ProjectItemRequest request) {
+
+        logger.info("Vinculando item id={} ao projeto id={}", request.getItemId(), projectId);
 
         Project project = projectRepository.findById(projectId)
                 .orElseThrow(() -> new ResourceNotFoundException("Projeto não encontrado"));
@@ -131,11 +152,12 @@ public class ProjectService {
         Item item = itemRepository.findById(request.getItemId())
                 .orElseThrow(() -> new ResourceNotFoundException("Item não encontrado"));
 
-        if (item.getDeletedAt() != null || item.getIsInactive() == true) {
+        if (item.getDeletedAt() != null || item.getIsInactive()) {
             throw new ResourceNotFoundException("Item não encontrado");
         }
 
         if (projectItemRepository.existsByProjectIdAndItemId(projectId, request.getItemId())) {
+            logger.warn("Vínculo recusado: item id={} ja esta no projeto id={}", request.getItemId(), projectId);
             throw new BusinessException("Item já está vinculado a este projeto");
         }
 
@@ -149,7 +171,10 @@ public class ProjectService {
         return toProjectResponse(project);
     }
 
+    @Transactional
     public ProjectResponse removeItem (Long projectId, Long itemId) {
+
+        logger.info("Removendo item id={} do projeto id={}", itemId, projectId);
 
         Project project = projectRepository.findById(projectId)
                 .orElseThrow(() -> new ResourceNotFoundException("Projeto não encontrado"));
