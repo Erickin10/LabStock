@@ -19,7 +19,6 @@ public class UserController {
     @Autowired
     private UserService userService;
 
-
     @GetMapping
     public ResponseEntity<ApiResponse<List<UserResponse>>> listAll (@RequestParam(required = false) String search) {
         List<UserResponse> responses = userService.listAll(search);

@@ -34,8 +34,12 @@ public class ItemController {
     }
 
     @GetMapping
-    public ResponseEntity<ApiResponse<List<ItemResponse>>> listAll (@RequestParam(required = false) String search) {
-        List<ItemResponse> responses = itemService.listAll(search);
+    public ResponseEntity<ApiResponse<List<ItemResponse>>> listAll (
+            @RequestParam(required = false) String name,
+            @RequestParam(required = false) String category) {
+
+        List<ItemResponse> responses = itemService.listAll(name, category);
+
         return ResponseEntity.ok(ApiResponse.success("Itens listados com sucesso", responses));
     }
 
