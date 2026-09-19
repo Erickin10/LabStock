@@ -78,7 +78,6 @@ public class DamagedService {
         damaged.setQuantity(request.getQuantity());
 
         damagedRepository.save(damaged);
-        logger.info("Dano registrado com sucesso, id={}", damaged.getId());
 
         return toDamagedResponse(damaged);
     }

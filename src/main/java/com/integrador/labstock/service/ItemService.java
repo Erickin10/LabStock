@@ -51,8 +51,6 @@ public class ItemService {
 
         itemRepository.save(item);
 
-        logger.info("Item criado com sucesso, id={}", item.getId());
-
         return toItemResponse(item);
     }
 
@@ -118,8 +116,6 @@ public class ItemService {
 
         itemRepository.save(item);
 
-        logger.info("Item id={} atualizado com sucesso", id);
-
         return toItemResponse(item);
     }
 
@@ -139,8 +135,6 @@ public class ItemService {
 
         itemRepository.save(item);
 
-        logger.info("Item id={} agora esta com isInactive={}", id, item.getIsInactive());
-
         return toItemResponse(item);
     }
 
@@ -158,8 +152,6 @@ public class ItemService {
 
         item.setDeletedAt(LocalDateTime.now());
         itemRepository.save(item);
-
-        logger.info("Item id={} excluído com sucesso", id);
     }
 
     private ItemResponse toItemResponse(Item item) {

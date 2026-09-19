@@ -40,7 +40,7 @@ public class LendingService {
     @Transactional
     public LendingResponse create (LendingRequest request) {
 
-        logger.info("Iniciando criacaoo de emprestimo para o item id={}", request.getItemId());
+        logger.info("Criando emprestimo para o item id={}", request.getItemId());
 
         Item item = itemRepository.findById(request.getItemId())
                 .orElseThrow(() -> new ResourceNotFoundException("Item não encontrado"));
@@ -78,8 +78,6 @@ public class LendingService {
         lending.setQuantity(request.getQuantity());
 
         lendingRepository.save(lending);
-
-        logger.info("Empréstimo criado com sucesso, id={}", lending.getId());
 
         return toLendingResponse(lending);
     }
@@ -146,8 +144,6 @@ public class LendingService {
 
         lendingRepository.save(lending);
 
-        logger.info("Emprestimo id={} aprovado com sucesso", id);
-
         return toLendingResponse(lending);
     }
 
@@ -169,8 +165,6 @@ public class LendingService {
         }
 
         lending.setStatus(LendingStatus.REJECTED);
-
-        logger.info("Emprestimo id={} rejeitado com sucesso", id);
 
         lendingRepository.save(lending);
 
@@ -203,8 +197,6 @@ public class LendingService {
         lending.setReturnDate(LocalDateTime.now());
 
         lendingRepository.save(lending);
-
-        logger.info("Empréstimo id={} devolvido com sucesso", id);
 
         return toLendingResponse(lending);
     }

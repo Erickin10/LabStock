@@ -51,8 +51,6 @@ public class ProjectService {
 
         projectRepository.save(project);
 
-        logger.info("Projeto criado com sucesso, id={}", project.getId());
-
         return toProjectResponse(project);
     }
 
@@ -101,8 +99,6 @@ public class ProjectService {
 
         projectRepository.save(project);
 
-        logger.info("Projeto id={} atualizado com sucesso", id);
-
         return toProjectResponse(project);
     }
 
@@ -122,8 +118,6 @@ public class ProjectService {
 
         projectRepository.save(project);
 
-        logger.info("Projeto id={} agora está com isInactive={}", id, project.getIsInactive());
-
         return toProjectResponse(project);
     }
 
@@ -141,8 +135,6 @@ public class ProjectService {
 
         project.setDeletedAt(LocalDateTime.now());
         projectRepository.save(project);
-        logger.info("Projeto id={} excluído com sucesso", id);
-
     }
 
     @Transactional
@@ -176,8 +168,6 @@ public class ProjectService {
 
         projectItemRepository.save(projectItem);
 
-        logger.info("Item id={} vinculado ao projeto id={} com sucesso", request.getItemId(), projectId);
-
         return toProjectResponse(project);
     }
 
@@ -197,8 +187,6 @@ public class ProjectService {
                 .orElseThrow(() -> new ResourceNotFoundException("Item não está vinculado a este projeto"));
 
         projectItemRepository.delete(projectItem);
-
-        logger.info("Item id={} removido do projeto id={} com sucesso", itemId, projectId);
 
         return toProjectResponse(project);
     }

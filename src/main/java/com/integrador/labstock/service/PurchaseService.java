@@ -66,7 +66,6 @@ public class PurchaseService {
 
         purchaseRepository.save(purchase);
 
-        logger.info("Sugestao de compra id={} marcada como comprada com sucesso", id);
         return toPurchaseResponse(purchase);
     }
 

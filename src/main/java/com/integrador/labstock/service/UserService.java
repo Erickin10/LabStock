@@ -50,8 +50,6 @@ public class UserService {
         // Salva no banco
         userRepository.save(user);
 
-        logger.info("Usuário registrado com sucesso, id={}", user.getId());
-
         // Monta e retorna o response
         LoginResponse response = new LoginResponse();
         response.setId(user.getId());
@@ -75,8 +73,6 @@ public class UserService {
             logger.warn("Login recusado: senha invalida para email={}", request.getEmail());
             throw new BusinessException("Email ou senha inválidos");
         }
-
-        logger.info("Login realizado com sucesso, id={}", user.getId());
 
         LoginResponse response = new LoginResponse();
         response.setId(user.getId());
@@ -138,8 +134,6 @@ public class UserService {
 
         userRepository.save(user);
 
-        logger.info("Role do usuario id={} atualizada com sucesso", id);
-
         return toUserResponse(user);
     }
 
@@ -174,8 +168,6 @@ public class UserService {
 
         userRepository.save(user);
 
-        logger.info("Perfil do usuario id={} atualizado com sucesso", id);
-
         return toUserResponse(user);
     }
 
@@ -193,8 +185,6 @@ public class UserService {
 
         user.setDeletedAt(LocalDateTime.now());
         userRepository.save(user);
-
-        logger.info("Usuario id={} excluido com sucesso", id);
     }
 
     private UserResponse toUserResponse(User user) {
