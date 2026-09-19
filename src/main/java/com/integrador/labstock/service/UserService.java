@@ -65,9 +65,10 @@ public class UserService {
     public LoginResponse login (LoginRequest request) {
 
         User user = userRepository.findByEmailAndDeletedAtIsNull(request.getEmail())
-                .orElseThrow(() ->
-                        new BusinessException("Email ou senha inválidos"));
+                .orElseThrow(() -> {
                         logger.warn("Login recusado: email={} não encontrado", request.getEmail());
+                        return new BusinessException("Email ou senha inválidos");
+                });
 
         // Compara a senha
         if (!user.getPassword().equals(request.getPassword())) {

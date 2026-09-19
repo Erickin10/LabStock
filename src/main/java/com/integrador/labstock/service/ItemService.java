@@ -47,7 +47,7 @@ public class ItemService {
         item.setName(request.getName());
         item.setCategory(category);
         item.setQuantity(request.getQuantity());
-        item.setMin_quantity(request.getMinQuantity());
+        item.setMinQuantity(request.getMinQuantity());
 
         itemRepository.save(item);
 
@@ -58,7 +58,7 @@ public class ItemService {
 
     public List<ItemResponse> listAll (String name, String category) {
 
-        System.out.println("NOME RECEBIDO: [" + name + "] | CATEGORIA RECEBIDA: [" + category + "]");
+        logger.debug("Buscando itens: nome={}, categoria={}", name, category);
 
         List<Item> items;
 
@@ -114,7 +114,7 @@ public class ItemService {
         item.setName(request.getName());
         item.setCategory(category);
         item.setQuantity(request.getQuantity());
-        item.setMin_quantity(request.getMinQuantity());
+        item.setMinQuantity(request.getMinQuantity());
 
         itemRepository.save(item);
 
@@ -172,7 +172,7 @@ public class ItemService {
         response.setCategory(item.getCategory().name());
         response.setQuantity(item.getQuantity());
         response.setAvailableQuantity(availableQuantity);
-        response.setMinQuantity(item.getMin_quantity());
+        response.setMinQuantity(item.getMinQuantity());
         response.setIsInactive(item.getIsInactive());
         return response;
     }

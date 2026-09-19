@@ -18,8 +18,8 @@ public interface UserRepository extends JpaRepository<User, Long> {
     // Barra de busca unica — procura o mesmo texto no nome OU no email OU na role
     @Query("SELECT u FROM User u WHERE u.deletedAt IS NULL " +
            "AND (LOWER(u.name) LIKE LOWER(CONCAT('%', :search, '%')) " +
-           "OR LOWER(u.email) LIKE LOWER(CONCAT('%', :search, '%')))" +
-           "OR LOWER(u.role) LIKE LOWER(CONCAT('%', :search, '%'))")
+           "OR LOWER(u.email) LIKE LOWER(CONCAT('%', :search, '%')) " +
+           "OR CAST(u.role AS string) LIKE UPPER(CONCAT('%', :search, '%')))")
     List<User> findBySearch(@Param("search") String search);
 
     // Lista todos os usuarios ativos

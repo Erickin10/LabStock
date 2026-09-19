@@ -30,8 +30,8 @@ public class Item extends BaseEntity {
     @Column(nullable = false)
     private Integer quantity;
 
-    @Column(nullable = false)
-    private Integer min_quantity;
+    @Column(name = "min_quantity", nullable = false)
+    private Integer minQuantity;
 
     @Column(name = "is_inactive", nullable = false)
     private Boolean isInactive = false;
