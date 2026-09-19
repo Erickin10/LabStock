@@ -38,7 +38,7 @@ public class UserController {
     }
 
     @PutMapping("/{id}/profile")
-    public ResponseEntity<ApiResponse<UserResponse>> updateProfile (@PathVariable Long id, @RequestBody UpdateProfileRequest request) {
+    public ResponseEntity<ApiResponse<UserResponse>> updateProfile (@PathVariable Long id, @Valid @RequestBody UpdateProfileRequest request) {
         UserResponse response = userService.updateProfile(id, request);
         return ResponseEntity.ok(ApiResponse.success("Perfil atualizado com sucesso", response));
     }

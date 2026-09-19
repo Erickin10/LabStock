@@ -30,6 +30,7 @@ public class GlobalExceptionHandler {
     // Captura BusinessException e retorna 400 (Bad Request)
     @ExceptionHandler(BusinessException.class)
     public ResponseEntity<ApiResponse<Void>> handleBusinessException(BusinessException ex) {
+        logger.warn("Erro de negocio: {}", ex.getMessage());
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
                 .body(ApiResponse.error(ex.getMessage()));
@@ -48,7 +49,7 @@ public class GlobalExceptionHandler {
     // Captura qualquer outra excecao nao tratada (erro inesperado)
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiResponse<Void>> handleGenericException(Exception ex) {
-        logger.error("Violacao de integridade de dados: {}", ex.getMessage());
+        logger.error("Erro inesperado: {}", ex.getMessage(), ex);
         return ResponseEntity
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(ApiResponse.error("Erro interno do servidor"));
