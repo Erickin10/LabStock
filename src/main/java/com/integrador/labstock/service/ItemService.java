@@ -1,5 +1,7 @@
 package com.integrador.labstock.service;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
 import com.integrador.labstock.dto.request.ItemRequest;
 import com.integrador.labstock.dto.response.ItemResponse;
@@ -26,13 +28,18 @@ public class ItemService {
     @Autowired
     private LendingRepository lendingRepository;
 
+    private static final Logger logger = LoggerFactory.getLogger(ItemService.class);
+
     @Transactional
     public ItemResponse create (ItemRequest request) {
+
+        logger.info("Criando item com nome={}", request.getName());
 
         Category category;
         try {
             category = Category.valueOf(request.getCategory().toUpperCase());
         } catch (IllegalArgumentException e) {
+            logger.warn("Criacao de item recusada: categoria invalida={}", request.getCategory());
             throw new BusinessException("Categoria inválida");
         }
 
@@ -43,6 +50,8 @@ public class ItemService {
         item.setMin_quantity(request.getMinQuantity());
 
         itemRepository.save(item);
+
+        logger.info("Item criado com sucesso, id={}", item.getId());
 
         return toItemResponse(item);
     }
@@ -79,6 +88,8 @@ public class ItemService {
     @Transactional
     public ItemResponse update (Long id, ItemRequest request) {
 
+        logger.info("Atualizando item id={}", id);
+
         Item item = itemRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Item não encontrado"));
 
@@ -90,6 +101,7 @@ public class ItemService {
         try {
             category = Category.valueOf(request.getCategory().toUpperCase());
         } catch (IllegalArgumentException e) {
+            logger.warn("Atualização recusada: categoria inválida={}", request.getCategory());
             throw new BusinessException("Categoria inválida");
         }
 
@@ -100,11 +112,15 @@ public class ItemService {
 
         itemRepository.save(item);
 
+        logger.info("Item id={} atualizado com sucesso", id);
+
         return toItemResponse(item);
     }
 
     @Transactional
     public ItemResponse inactivate (Long id) {
+
+        logger.info("Alternando status ativo para inativo do item id={}", id);
 
         Item item = itemRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Item não encontrado"));
@@ -117,11 +133,15 @@ public class ItemService {
 
         itemRepository.save(item);
 
+        logger.info("Item id={} agora esta com isInactive={}", id, item.getIsInactive());
+
         return toItemResponse(item);
     }
 
     @Transactional
     public void delete (Long id) {
+
+        logger.info("Excluindo item id={}", id);
 
         Item item = itemRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Item não encontrado"));
@@ -132,6 +152,8 @@ public class ItemService {
 
         item.setDeletedAt(LocalDateTime.now());
         itemRepository.save(item);
+
+        logger.info("Item id={} excluído com sucesso", id);
     }
 
     private ItemResponse toItemResponse(Item item) {

@@ -1,5 +1,7 @@
 package com.integrador.labstock.service;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
 import com.integrador.labstock.dto.response.PurchaseResponse;
 import com.integrador.labstock.entity.Purchase;
@@ -18,6 +20,8 @@ public class PurchaseService {
 
     @Autowired
     private PurchaseRepository purchaseRepository;
+
+    private static final Logger logger = LoggerFactory.getLogger(PurchaseService.class);
 
     public List<PurchaseResponse> listPending () {
 
@@ -44,6 +48,8 @@ public class PurchaseService {
     @Transactional
     public PurchaseResponse markAsBought (Long id) {
 
+        logger.info("Marcando sugestao de compra id={} como comprada", id);
+
         Purchase purchase = purchaseRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Sugestão de compra não encontrada"));
 
@@ -52,6 +58,7 @@ public class PurchaseService {
         }
 
         if (purchase.getBought()) {
+            logger.warn("Operacao recusada: sugestao id={} ja estava marcada como comprada", id);
             throw new BusinessException("Sugestão já foi marcada como comprada");
         }
 
@@ -59,6 +66,7 @@ public class PurchaseService {
 
         purchaseRepository.save(purchase);
 
+        logger.info("Sugestao de compra id={} marcada como comprada com sucesso", id);
         return toPurchaseResponse(purchase);
     }
 
