@@ -1,6 +1,7 @@
 package com.integrador.labstock.exception;
 
 
+import feign.FeignException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.integrador.labstock.dto.response.ApiResponse;
@@ -44,6 +45,14 @@ public class GlobalExceptionHandler {
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
                 .body(ApiResponse.error(message));
+    }
+
+    @ExceptionHandler(FeignException.class)
+    public ResponseEntity<ApiResponse<Void>> handleFeignException(FeignException ex) {
+        logger.error("Erro na comunicacao com API externa: {}", ex.getMessage());
+        return ResponseEntity
+                .status(HttpStatus.BAD_GATEWAY)
+                .body(ApiResponse.error("Erro ao consultar serviço externo"));
     }
 
     // Captura qualquer outra excecao nao tratada (erro inesperado)
