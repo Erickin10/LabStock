@@ -149,6 +149,17 @@ class ItemServiceTest {
         verify(itemRepository, never()).findByCategory(any());
     }
 
+    @Test
+    void cenario8b_listAllComNomeECategoriaVaziaUsaSoOFiltroDeNome() {
+        when(itemRepository.findBySearch("resis")).thenReturn(List.of(item));
+
+        List<ItemResponse> responses = itemService.listAll("resis", "");
+
+        assertEquals(1, responses.size());
+        verify(itemRepository).findBySearch("resis");
+        verify(itemRepository, never()).findBySearchAndCategory(any(), any());
+    }
+
     // ===================== findById =====================
 
     @Test

@@ -55,4 +55,16 @@ class CountryControllerTest {
                 .andExpect(jsonPath("$.success").value(false))
                 .andExpect(jsonPath("$.message").value("Erro ao consultar serviço externo"));
     }
+
+    @Test
+    void cenario3_erroInesperadoRetorna500ComMensagemGenerica() throws Exception {
+        when(countryClient.getCountryByName(anyString(), anyString()))
+                .thenThrow(new RuntimeException("falha interna que nao pode vazar para o cliente"));
+
+        // O handler generico esconde o detalhe do erro por seguranca
+        mockMvc.perform(get("/countries").param("name", "brazil"))
+                .andExpect(status().isInternalServerError())
+                .andExpect(jsonPath("$.success").value(false))
+                .andExpect(jsonPath("$.message").value("Erro interno do servidor"));
+    }
 }

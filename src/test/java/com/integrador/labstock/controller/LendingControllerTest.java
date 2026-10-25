@@ -213,6 +213,15 @@ class LendingControllerTest extends IntegrationTestBase {
     }
 
     @Test
+    void cenario14b_listAllComStatusEmBrancoRetornaTodos() throws Exception {
+        criarEmprestimo(1);
+
+        mockMvc.perform(get("/lendings").param("status", ""))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.length()").value(1));
+    }
+
+    @Test
     void cenario15_listAllFiltraPorStatus() throws Exception {
         criarEmprestimo(1);
         Long aprovado = criarEmprestimo(2);
