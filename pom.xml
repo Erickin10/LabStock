@@ -17,6 +17,8 @@
 	<properties>
 		<java.version>17</java.version>
 		<spring-cloud.version>2025.1.3</spring-cloud.version>
+		<!-- Mesmas exclusoes do JaCoCo, para o Sonar nao contar essas classes como "sem cobertura" -->
+		<sonar.coverage.exclusions>**/entity/**,**/dto/**,**/config/**,**/client/**,**/LabStockApplication.java</sonar.coverage.exclusions>
 	</properties>
 
 	<dependencies>
