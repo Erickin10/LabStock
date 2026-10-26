@@ -1,4 +1,4 @@
-[README.md](https://github.com/user-attachments/files/33937889/README.md)
+
 # LabStock
 
 API REST para gerenciamento de estoque de um laboratório acadêmico: cadastro de itens, empréstimos com aprovação do professor, registro de itens danificados, projetos com lista de materiais e sugestões de compra.
